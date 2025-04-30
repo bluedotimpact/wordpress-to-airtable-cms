@@ -1,26 +1,35 @@
-import { getWordPressBlogs } from './getWordPressBlogs';
-import { insertIntoAirtable } from './insertIntoAirtable';
+import { fixAirtableBodiesWithAi } from './fixBlogBodiesWithAi';
+import { migrateBlogsToAirtable } from './storeBlogsInAirtable';
 
-// Get the blogs
-const blogs = getWordPressBlogs();
+// Check command line arguments to determine which function to run
+const args = process.argv.slice(2);
+const command = args[0];
 
-// Log the number of blogs found
-console.log(`Found ${blogs.length} blogs`);
-
-// Log the first blog's details as a sample
-if (blogs.length > 0) {
-  const firstBlog = blogs[0];
-  console.log('\nSample blog details:');
-  console.log(`Title: ${firstBlog.title}`);
-  console.log(`Slug: ${firstBlog.slug}`);
-  console.log(`Author: ${firstBlog.authorName}`);
-  console.log(`Author URL: ${firstBlog.authorUrl}`);
-  console.log(`Published: ${firstBlog.publishedAt}`);
-  console.log(`Is Public: ${firstBlog.isPublic}`);
-  console.log(`Sites Published On: ${firstBlog.sitesPublishedOn.join(', ')}`);
-  console.log(`Content Preview: ${firstBlog.body.substring(0, 200)}...`);
+async function main() {
+  try {
+    if (command === 'migrate') {
+      console.log('Starting WordPress to Airtable migration...');
+      await migrateBlogsToAirtable();
+      console.log('Migration completed successfully');
+    } else if (command === 'fix') {
+      console.log('Starting Airtable blog fixing...');
+      await fixAirtableBodiesWithAi();
+      console.log('Rendering completed successfully');
+    } else {
+      console.error(`Unknown command: ${command}`);
+      console.log(`Usage: ${process.argv.slice(0, 2).join(' ')} <command>`);
+      console.log('Available commands:');
+      console.log('  migrate - Migrate WordPress blogs to Airtable');
+      console.log('  fix  - Fix Airtable blogs with Claude');
+    }
+  } catch (error) {
+    console.error('An error occurred:', error);
+    process.exit(1);
+  }
 }
 
-console.log('Inserting into Airtable')
-await insertIntoAirtable(blogs);
-console.log(`Successfully inserted ${blogs.length} blogs into Airtable`)
+// Run the main function
+main().catch(error => {
+  console.error('Unhandled error:', error);
+  process.exit(1);
+});

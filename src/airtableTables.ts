@@ -42,6 +42,9 @@ export type CmsBlog = {
    * Maps from <category domain="category" .../> tags
    */
   sitesPublishedOn: string[],
+  oldSiteUrl: string,
+  stagingSiteUrl: string
+  aiRewrittenBody: string
 } & Item;
 
 export const cmsBlogTable: Table<CmsBlog> = {
@@ -57,6 +60,9 @@ export const cmsBlogTable: Table<CmsBlog> = {
     publishedAt: 'fldjp3x46apAPAXo7',
     isPublic: 'fldUmp9uro7Q7eJ6E',
     sitesPublishedOn: 'fld92KvouenaA1Meq',
+    oldSiteUrl: 'fldahq30FLOUnAdFM',
+    stagingSiteUrl: 'fldbLeZa6KRqq1so9',
+    aiRewrittenBody: 'fldnK2BnHtBUqlGD6',
   },
   schema: {
     title: 'string',
@@ -67,5 +73,8 @@ export const cmsBlogTable: Table<CmsBlog> = {
     authorUrl: 'string',
     isPublic: 'boolean',
     sitesPublishedOn: 'string[]',
+    oldSiteUrl: 'string',
+    stagingSiteUrl: 'string',
+    aiRewrittenBody: 'string',
   },
 };
