@@ -1,14 +1,13 @@
 import fs from 'fs';
 import { XMLParser } from 'fast-xml-parser';
 import TurndownService from 'turndown';
-import { CmsBlog } from './airtableTables';
+import { Project } from './airtableTables';
 
 /**
- * Converts WordPress blog posts from an XML export file to CmsBlog objects
- * @param filePath Optional path to the XML file. Defaults to 'data/posts.xml'
- * @returns Array of CmsBlog objects
+ * Converts WordPress project posts from an XML export file to Project objects
+ * @returns Array of Project objects
  */
-export const getWordPressBlogs = (filePath: string = 'data/posts.xml'): CmsBlog[] => {
+export const getWordPressProjects = (filePath: string = 'data/projects.xml'): Project[] => {
   try {
     // Read the XML file
     const xmlData = fs.readFileSync(filePath, 'utf8');
@@ -56,17 +55,51 @@ export const getWordPressBlogs = (filePath: string = 'data/posts.xml'): CmsBlog[
       }
     });
     
-    // Extract blog posts from the parsed data
+    // Extract project posts from the parsed data
     const items = result.rss.channel.item || [];
     
-    // Map WordPress posts to CmsBlog objects
-    return items.map((item: any) => {
-      // Extract categories
+    console.log(`Total items in XML: ${items.length}`);
+    
+    // Filter to only include items with post_type === 'project'
+    const projectItems = items.filter((item: any) => {
+      const postType = item['wp:post_type'];
+      // Log each item's post type for debugging
+      console.log(`Item title: ${item.title}, post type: ${postType}`);
+      
+      return postType && 
+        ((typeof postType === 'string' && postType === 'project') || 
+         (postType['#text'] && postType['#text'] === 'project'));
+    });
+
+    const attachments = items.filter((item: any) => {
+      const postType = item['wp:post_type'];
+      // Log each item's post type for debugging
+      console.log(`Item title: ${item.title}, post type: ${postType}`);
+      
+      return postType && 
+        ((typeof postType === 'string' && postType === 'attachment') || 
+         (postType['#text'] && postType['#text'] === 'attachment'));
+    });
+    
+    console.log(`Filtered project items: ${projectItems.length}`);
+    
+    // Map WordPress posts to Project objects
+    return projectItems.map((item: any) => {
+      // Extract tags/categories
       const categories = item.category || [];
-      const sitesPublishedOn = categories
-        .filter((cat: any) => cat['@_domain'] === 'category')
+      const tags = categories
+        .filter((cat: any) => cat['@_domain'] === 'post_tag')
         .map((cat: any) => {
           // Handle different possible structures
+          if (typeof cat === 'string') return cat;
+          if (cat['#text']) return cat['#text'];
+          return cat.toString();
+        });
+      
+      // Extract course/collection
+      const courseCategories = categories
+        .filter((cat: any) => cat['@_domain'] === 'project_collection')
+        .map((cat: any) => {
           if (typeof cat === 'string') return cat;
           if (cat['#text']) return cat['#text'];
           return cat.toString();
@@ -91,6 +124,23 @@ export const getWordPressBlogs = (filePath: string = 'data/posts.xml'): CmsBlog[
            (metaKey['#text'] && metaKey['#text'] === 'author_url'));
       });
       
+      // Find cover image
+      const thumbnailIdMeta = postMeta.find((meta: any) => {
+        const metaKey = meta['wp:meta_key'];
+        return metaKey && 
+          ((typeof metaKey === 'string' && metaKey === '_thumbnail_id') || 
+           (metaKey['#text'] && metaKey['#text'] === '_thumbnail_id'));
+      });
+      
+      // Find attachment URL
+      const attachmentUrlMeta = postMeta.find((meta: any) => {
+        const metaKey = meta['wp:meta_key'];
+        return metaKey && 
+          ((typeof metaKey === 'string' && metaKey === 'wp:attachment_url') || 
+           (metaKey['#text'] && metaKey['#text'] === 'wp:attachment_url'));
+      });
+      
+      // Extract values
       const authorName = authorMeta ? 
         (authorMeta['wp:meta_value']?.['#text'] || authorMeta['wp:meta_value'] || '') : 
         (item['dc:creator']?.['#text'] || item['dc:creator'] || '');
@@ -98,6 +148,21 @@ export const getWordPressBlogs = (filePath: string = 'data/posts.xml'): CmsBlog[
       const authorUrl = authorUrlMeta ? 
         (authorUrlMeta['wp:meta_value']?.['#text'] || authorUrlMeta['wp:meta_value'] || '') : 
         '';
+      
+      // Use attachment URL if available, otherwise use a placeholder
+      let coverImageSrc = '';
+      const attachment = attachments.find((attachment) => {
+        return thumbnailIdMeta && thumbnailIdMeta['wp:meta_value'] == attachment['wp:post_id'];
+      })
+      if (attachment) {
+        coverImageSrc = attachment['wp:attachment_url']?.['#text'] || attachment['wp:attachment_url'] || '';
+      } else if (attachmentUrlMeta) {
+        coverImageSrc = attachmentUrlMeta['wp:meta_value']?.['#text'] || attachmentUrlMeta['wp:meta_value'] || '';
+      } else if (item['wp:attachment_url']) {
+        coverImageSrc = typeof item['wp:attachment_url'] === 'string' ? 
+          item['wp:attachment_url'] : 
+          (item['wp:attachment_url']['#text'] || '');
+      }
       
       // Convert HTML content to Markdown
       let htmlContent = '';
@@ -109,10 +174,10 @@ export const getWordPressBlogs = (filePath: string = 'data/posts.xml'): CmsBlog[
       
       let markdownContent = turndownService.turndown(htmlContent);
       
-      // Remove caption tags but keep the Embed component inside
+      // Remove caption tags but keep the Embed component
       markdownContent = markdownContent.replace(
-        /\\\[caption(.*?)\\\]([.\n]*?)<Embed url="([^"]+)" \/>(.*?)\\\[\/caption\\\]/gm, 
-        '<Embed url="$2" />'
+        /\\\[caption(.*?)\\\]([\s\S]*?)<Embed url="([^"]+)" \/>([\s\S]*?)\\\[\/caption\\\]/gm, 
+        '<Embed url="$3" />'
       );
       
       // Extract title
@@ -147,19 +212,34 @@ export const getWordPressBlogs = (filePath: string = 'data/posts.xml'): CmsBlog[
           (item['wp:status']['#text'] || '');
       }
       
-      // Map to CmsBlog type
+      // Extract publish date and convert to timestamp (in seconds)
+      let publishedAt = 0;
+      if (item.pubDate) {
+        const pubDateStr = typeof item.pubDate === 'string' ? 
+          item.pubDate : 
+          (item.pubDate['#text'] || '');
+        
+        if (pubDateStr) {
+          // Convert to timestamp in seconds (not milliseconds)
+          publishedAt = Math.floor(new Date(pubDateStr).getTime() / 1000);
+        }
+      }
+      
+      // Map to Project type
       return {
         id,
         title,
         slug,
         body: markdownContent,
-        publishedAt: item.pubDate || '',
         authorName,
         authorUrl,
-        isPublic: status === 'publish',
-        sitesPublishedOn
-      } as CmsBlog;
-    }).filter((blog: CmsBlog) => blog.body.trim().length > 0);
+        coverImageSrc,
+        publishedAt,
+        publicationStatus: status,
+        course: courseCategories.length > 0 ? courseCategories[0] : '',
+        tag: tags
+      } as Project;
+    }).filter((project: Project) => project.body.trim().length > 0);
   } catch (error) {
     console.error('Error parsing WordPress XML:', error);
     return [];

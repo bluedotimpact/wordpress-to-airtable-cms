@@ -1,5 +1,49 @@
 import { Item, Table } from "airtable-ts";
 
+export type Project = {
+  id: string,
+  title: string,
+  slug: string,
+  body: string,
+  authorName: string,
+  authorUrl: string,
+  coverImageSrc: string,
+  publishedAt: number,
+  publicationStatus: string,
+  course: string,
+  tag: string[],
+} & Item;
+
+export const projectTable: Table<Project> = {
+  name: 'Project',
+  baseId: 'app63L1YChHfS6RJF',
+  tableId: 'tblYCFWqPy29YIWe6',
+  mappings: {
+    title: 'fldGyQnG2U6q5p5ny',
+    slug: 'fldX2rzTLpj9P9fdP',
+    body: 'fldjW7BnaXVCttBQn',
+    authorName: 'fldGpZHynFhhAx13S',
+    authorUrl: 'fldJiHv2mFQzEdz7L',
+    coverImageSrc: 'fldliLiVCys4rLX7S',
+    publishedAt: 'fldoTpdgfEBNQgej9',
+    publicationStatus: 'fldn7RrnTe80QUEt6',
+    course: 'fldNHNMuxmQjaokmY',
+    tag: 'fldeTqWZOvybdopnK',
+  },
+  schema: {
+    title: 'string',
+    slug: 'string',
+    body: 'string',
+    authorName: 'string',
+    authorUrl: 'string',
+    coverImageSrc: 'string',
+    publishedAt: 'number',
+    publicationStatus: 'string',
+    course: 'string',
+    tag: 'string[]',
+  },
+};
+
 export type CmsBlog = {
   id: string,
   /**

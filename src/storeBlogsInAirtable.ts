@@ -1,9 +1,9 @@
 import { getWordPressBlogs } from './getWordPressBlogs';
 import { insertIntoAirtable } from './insertIntoAirtable';
 
-export const migrateBlogsToAirtable = async () => {
+export const migrateBlogsToAirtable = async (filePath?: string) => {
   // Get the blogs
-  const blogs = getWordPressBlogs();
+  const blogs = getWordPressBlogs(filePath);
 
   // Log the number of blogs found
   console.log(`Found ${blogs.length} blogs`);
@@ -23,6 +23,6 @@ export const migrateBlogsToAirtable = async () => {
   }
 
   console.log('Inserting into Airtable');
-  await insertIntoAirtable(blogs);
+  await insertIntoAirtable(blogs, 'blog');
   console.log(`Successfully inserted ${blogs.length} blogs into Airtable`);
 };
