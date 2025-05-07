@@ -21,3 +21,8 @@ Some helper scripts and documentation about how we moved our blog and projects f
 ## Tidy up project data with AI
 
 1. Run `AIRTABLE_API_KEY=pat123.def ANTHROPIC_API_KEY=sk-ant-abcd npm start fix-projects` (with your Airtable access token and Anthropic API key)
+
+## Check project rendering on the new site
+
+1. Run `AIRTABLE_API_KEY=pat123.def ANTHROPIC_API_KEY=sk-ant-abcd npm start check-rendering` to check if projects render properly on the new site
+2. The script will print any problematic pages to the console with detailed issues

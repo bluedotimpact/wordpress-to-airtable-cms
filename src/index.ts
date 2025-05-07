@@ -2,6 +2,7 @@ import { fixAirtableBodiesWithAi } from './fixBlogBodiesWithAi';
 import { fixProjectBodiesWithAi } from './fixProjectBodiesWithAi';
 import { migrateBlogsToAirtable } from './storeBlogsInAirtable';
 import { migrateProjectsToAirtable } from './storeProjectsInAirtable';
+import { checkAllProjectRendering } from './checkProjectRendering';
 
 // Check command line arguments to determine which function to run
 const args = process.argv.slice(2);
@@ -26,6 +27,10 @@ async function main() {
       console.log('Starting Airtable project fixing...');
       await fixProjectBodiesWithAi();
       console.log('Project fixing completed successfully');
+    } else if (command === 'check-rendering') {
+      console.log('Starting project rendering check...');
+      await checkAllProjectRendering();
+      console.log('Rendering check completed successfully');
     } else {
       console.error(`Unknown command: ${command}`);
       console.log(`Usage: ${process.argv.slice(0, 2).join(' ')} <command> [file-path]`);
@@ -34,6 +39,7 @@ async function main() {
       console.log('  migrate-projects [file-path] - Migrate WordPress projects to Airtable');
       console.log('  fix-blogs - Fix Airtable blog bodies with Claude AI');
       console.log('  fix-projects - Fix Airtable project bodies with Claude AI');
+      console.log('  check-rendering - Check if projects render properly on the new site');
     }
   } catch (error) {
     console.error('An error occurred:', error);
