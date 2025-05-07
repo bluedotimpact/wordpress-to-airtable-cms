@@ -237,7 +237,8 @@ export const getWordPressProjects = (filePath: string = 'data/projects.xml'): Pr
         publishedAt,
         publicationStatus: status,
         course: courseCategories.length > 0 ? courseCategories[0] : '',
-        tag: tags
+        tag: tags,
+        aiRewrittenBody: '' // Initialize with empty string
       } as Project;
     }).filter((project: Project) => project.body.trim().length > 0);
   } catch (error) {

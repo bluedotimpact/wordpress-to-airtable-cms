@@ -1,4 +1,5 @@
 import { fixAirtableBodiesWithAi } from './fixBlogBodiesWithAi';
+import { fixProjectBodiesWithAi } from './fixProjectBodiesWithAi';
 import { migrateBlogsToAirtable } from './storeBlogsInAirtable';
 import { migrateProjectsToAirtable } from './storeProjectsInAirtable';
 
@@ -17,17 +18,22 @@ async function main() {
       console.log('Starting WordPress projects to Airtable migration...');
       await migrateProjectsToAirtable(filePath);
       console.log('Project migration completed successfully');
-    } else if (command === 'fix') {
+    } else if (command === 'fix-blogs') {
       console.log('Starting Airtable blog fixing...');
       await fixAirtableBodiesWithAi();
-      console.log('Rendering completed successfully');
+      console.log('Blog fixing completed successfully');
+    } else if (command === 'fix-projects') {
+      console.log('Starting Airtable project fixing...');
+      await fixProjectBodiesWithAi();
+      console.log('Project fixing completed successfully');
     } else {
       console.error(`Unknown command: ${command}`);
       console.log(`Usage: ${process.argv.slice(0, 2).join(' ')} <command> [file-path]`);
       console.log('Available commands:');
       console.log('  migrate-blogs [file-path] - Migrate WordPress blogs to Airtable');
       console.log('  migrate-projects [file-path] - Migrate WordPress projects to Airtable');
-      console.log('  fix - Fix Airtable blogs with Claude');
+      console.log('  fix-blogs - Fix Airtable blog bodies with Claude AI');
+      console.log('  fix-projects - Fix Airtable project bodies with Claude AI');
     }
   } catch (error) {
     console.error('An error occurred:', error);

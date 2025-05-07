@@ -16,4 +16,8 @@ Some helper scripts and documentation about how we moved our blog and projects f
 
 ## Tidy up blog data with AI
 
-1. Run `AIRTABLE_API_KEY=pat123.def ANTHROPIC_API_KEY=sk-ant-abcd npm start fix` (with your Airtable access token and Anthropic API key)
+1. Run `AIRTABLE_API_KEY=pat123.def ANTHROPIC_API_KEY=sk-ant-abcd npm start fix-blogs` (with your Airtable access token and Anthropic API key)
+
+## Tidy up project data with AI
+
+1. Run `AIRTABLE_API_KEY=pat123.def ANTHROPIC_API_KEY=sk-ant-abcd npm start fix-projects` (with your Airtable access token and Anthropic API key)

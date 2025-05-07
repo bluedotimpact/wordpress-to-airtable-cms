@@ -12,6 +12,7 @@ export type Project = {
   publicationStatus: string,
   course: string,
   tag: string[],
+  aiRewrittenBody: string
 } & Item;
 
 export const projectTable: Table<Project> = {
@@ -29,6 +30,7 @@ export const projectTable: Table<Project> = {
     publicationStatus: 'fldn7RrnTe80QUEt6',
     course: 'fldNHNMuxmQjaokmY',
     tag: 'fldeTqWZOvybdopnK',
+    aiRewrittenBody: 'fldseohzQXN7r1Xy8',
   },
   schema: {
     title: 'string',
@@ -41,6 +43,7 @@ export const projectTable: Table<Project> = {
     publicationStatus: 'string',
     course: 'string',
     tag: 'string[]',
+    aiRewrittenBody: 'string',
   },
 };
 
