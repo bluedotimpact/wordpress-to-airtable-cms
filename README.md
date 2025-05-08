@@ -26,3 +26,8 @@ Some helper scripts and documentation about how we moved our blog and projects f
 
 1. Run `AIRTABLE_API_KEY=pat123.def ANTHROPIC_API_KEY=sk-ant-abcd npm start check-rendering` to check if projects render properly on the new site
 2. The script will print any problematic pages to the console with detailed issues
+
+## Migrate CMS files to S3
+
+1. Run `AIRTABLE_API_KEY=your_airtable_api_key WEBSITE_ASSETS_BUCKET_ACCESS_KEY_ID=your_access_key_id WEBSITE_ASSETS_BUCKET_SECRET_ACCESS_KEY=your_secret_access_key npm start migrate-cms-files` to migrate all CMS files to S3
+2. The script will find any URLs in blogs and projects that point to the old CMS (cms.bluedot.org/u/...), download those files, upload them to an S3 bucket, and update the links in the text.

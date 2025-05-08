@@ -3,6 +3,7 @@ import { fixProjectBodiesWithAi } from './fixProjectBodiesWithAi';
 import { migrateBlogsToAirtable } from './storeBlogsInAirtable';
 import { migrateProjectsToAirtable } from './storeProjectsInAirtable';
 import { checkAllProjectRendering } from './checkProjectRendering';
+import { migrateCmsFilesToS3 } from './migrateCmsFilesToS3';
 
 // Check command line arguments to determine which function to run
 const args = process.argv.slice(2);
@@ -31,6 +32,10 @@ async function main() {
       console.log('Starting project rendering check...');
       await checkAllProjectRendering();
       console.log('Rendering check completed successfully');
+    } else if (command === 'migrate-cms-files') {
+      console.log('Starting migration of CMS files to S3...');
+      await migrateCmsFilesToS3();
+      console.log('CMS files migration completed successfully');
     } else {
       console.error(`Unknown command: ${command}`);
       console.log(`Usage: ${process.argv.slice(0, 2).join(' ')} <command> [file-path]`);
@@ -40,6 +45,8 @@ async function main() {
       console.log('  fix-blogs - Fix Airtable blog bodies with Claude AI');
       console.log('  fix-projects - Fix Airtable project bodies with Claude AI');
       console.log('  check-rendering - Check if projects render properly on the new site');
+      console.log('  migrate-cms-files - Migrate CMS files to S3 and update links');
+      console.log('  test-migration - Run a test migration of CMS files to S3');
     }
   } catch (error) {
     console.error('An error occurred:', error);

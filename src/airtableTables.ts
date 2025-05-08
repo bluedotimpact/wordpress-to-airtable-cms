@@ -80,11 +80,6 @@ export type CmsBlog = {
    */
   authorUrl: string,
   /**
-   * Whether the blog post is public.
-   * Maps from wp:status
-   */
-  isPublic: boolean,
-  /**
    * Home, AI Safety, Biosecurity
    * Maps from <category domain="category" .../> tags
    */
@@ -105,7 +100,6 @@ export const cmsBlogTable: Table<CmsBlog> = {
     authorName: 'fldBVD1meb54zRK8Q',
     authorUrl: 'fldEOlPQdbEmDxicJ',
     publishedAt: 'fldjp3x46apAPAXo7',
-    isPublic: 'fldUmp9uro7Q7eJ6E',
     sitesPublishedOn: 'fld92KvouenaA1Meq',
     oldSiteUrl: 'fldahq30FLOUnAdFM',
     stagingSiteUrl: 'fldbLeZa6KRqq1so9',
@@ -118,7 +112,6 @@ export const cmsBlogTable: Table<CmsBlog> = {
     publishedAt: 'string',
     authorName: 'string',
     authorUrl: 'string',
-    isPublic: 'boolean',
     sitesPublishedOn: 'string[]',
     oldSiteUrl: 'string',
     stagingSiteUrl: 'string',
