@@ -46,7 +46,6 @@ async function main() {
       console.log('  fix-projects - Fix Airtable project bodies with Claude AI');
       console.log('  check-rendering - Check if projects render properly on the new site');
       console.log('  migrate-cms-files - Migrate CMS files to S3 and update links');
-      console.log('  test-migration - Run a test migration of CMS files to S3');
     }
   } catch (error) {
     console.error('An error occurred:', error);
